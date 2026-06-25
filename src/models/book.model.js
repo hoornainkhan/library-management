@@ -13,8 +13,8 @@ const bookSchema = new mongoose.Schema({
   },
   isbn: {
     type: String,
-    unique: true,
-    sparse: true
+    sparse: true,
+    default: null
   },
   description: {
     type: String,
@@ -42,11 +42,12 @@ const bookSchema = new mongoose.Schema({
   }],
   openLibraryId: {
     type: String,
-    unique: true,
     sparse: true
   }
 }, {
   timestamps: true
 });
+
+bookSchema.index({ isbn: 1 });
 
 module.exports = mongoose.model('Book', bookSchema);

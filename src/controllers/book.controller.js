@@ -1,44 +1,50 @@
 const Book = require('../models/book.model');
-const { fetchBooksFromOpenLibrary } = require('../services/openLibrary.service');
+const { fetchBooksFromGutendex } = require('../services/gutendex.service');
 
 const seedBooks = async (req, res) => {
   try {
-    const books = await fetchBooksFromOpenLibrary(50);
+    console.log('Starting to seed books from Gutendex...');
     
+    const books = await fetchBooksFromGutendex(50);
+    console.log(`Fetched ${books.length} books from Gutendex`);
+
     let added = 0;
     let skipped = 0;
 
-    for (const bookData of books) {
+    for (const [index, bookData] of books.entries()) {
       try {
         bookData.availableCopies = bookData.totalCopies;
+        
         const existingBook = await Book.findOne({ 
-          $or: [
-            { isbn: bookData.isbn },
-            { openLibraryId: bookData.openLibraryId }
-          ]
+          title: bookData.title,
+          author: bookData.author
         });
 
         if (!existingBook) {
           await Book.create(bookData);
           added++;
+          console.log(`Added: ${bookData.title} (${index + 1}/${books.length})`);
         } else {
           skipped++;
+          console.log(`Skipped (duplicate): ${bookData.title}`);
         }
       } catch (error) {
-        console.error('Error saving book:', error.message);
+        console.error(`Error saving book ${index + 1}:`, error.message);
         skipped++;
       }
     }
 
+    console.log(`Seed complete - Added: ${added}, Skipped: ${skipped}`);
+    
     res.status(201).json({
-      message: 'Books seeded successfully',
+      message: 'Books seeded successfully from Gutendex',
       added,
       skipped,
       total: books.length
     });
   } catch (error) {
     console.error('Seed books error:', error);
-    res.status(500).json({ message: 'Error seeding books' });
+    res.status(500).json({ message: 'Error seeding books: ' + error.message });
   }
 };
 
