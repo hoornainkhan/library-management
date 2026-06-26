@@ -11,14 +11,16 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,  // This sends cookies automatically
+  withCredentials: true, // This sends cookies automatically
 });
 
-// Remove the token interceptor - we use cookies instead
+// Remove ALL interceptors that check for tokens
+// Just handle 401 responses
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear user data and redirect to login
       localStorage.removeItem('user');
       window.location.href = '/';
     }

@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ONLY load user from localStorage
     const storedUser = localStorage.getItem('user');
     console.log('AuthProvider - storedUser:', storedUser);
     
@@ -32,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     console.log('logoutUser called');
     setUser(null);
     localStorage.removeItem('user');
-    // Token is in cookie, backend will handle clearing it
+    // Token is in cookie - backend handles clearing it
   };
 
   const value = {

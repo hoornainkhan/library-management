@@ -38,16 +38,19 @@ const Login = () => {
 
       const { user } = response.data;
       
-      // Save ONLY user to localStorage (no token)
-      localStorage.setItem('user', JSON.stringify(user));
-      console.log('User saved to localStorage');
-      
-      // Update auth context
-      loginUser(user);
-      
-      // Navigate
-      const redirectUrl = user.role === 'admin' ? '/admin' : '/user';
-      navigate(redirectUrl, { replace: true });
+      // Save ONLY user data to localStorage (NOT token)
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+        console.log('User saved to localStorage');
+        
+        // Update auth context
+        loginUser(user);
+        
+        // Navigate based on role
+        const redirectUrl = user.role === 'admin' ? '/admin' : '/user';
+        console.log('Redirecting to:', redirectUrl);
+        navigate(redirectUrl, { replace: true });
+      }
       
     } catch (err) {
       console.error('Login error:', err);

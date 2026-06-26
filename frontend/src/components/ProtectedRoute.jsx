@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  // Only check for user in localStorage - no token check
+  // Check ONLY for user data in localStorage
   const userStr = localStorage.getItem('user');
   
   console.log('ProtectedRoute - userStr:', userStr);
