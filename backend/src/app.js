@@ -6,16 +6,16 @@ require('dotenv').config();
 
 const app = express();
 
-// Dynamic CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  process.env.FRONTEND_URL  // From .env
-].filter(Boolean);  // Remove undefined values
-
+// CORS configuration - CRITICAL for production
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://library-management-pink-six.vercel.app'
+  ],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
 app.use(express.json());
