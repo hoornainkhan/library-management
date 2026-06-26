@@ -1,20 +1,34 @@
 import axios from 'axios';
 
+// Hardcode the Render URL (temporary fix)
+const API_URL = 'https://library-management-j6ec.onrender.com/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,  // This sends cookies automatically
+  withCredentials: true,
 });
 
-// No need to add Authorization header - cookies handle authentication
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-// Handle 401 responses
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/';
     }
