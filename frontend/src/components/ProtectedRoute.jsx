@@ -2,11 +2,10 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
+  // Only check for user in localStorage - no token check
   const userStr = localStorage.getItem('user');
-  const token = localStorage.getItem('token');
   
   console.log('ProtectedRoute - userStr:', userStr);
-  console.log('ProtectedRoute - token:', token);
   
   if (!userStr) {
     console.log('No user found, redirecting to login');
@@ -15,7 +14,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   try {
     const user = JSON.parse(userStr);
-    console.log('ProtectedRoute - parsed user:', user);
+    console.log('ProtectedRoute - user:', user);
     
     if (requiredRole && user.role !== requiredRole) {
       console.log(`Wrong role. Required: ${requiredRole}, Got: ${user.role}`);

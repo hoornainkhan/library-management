@@ -1,17 +1,27 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { HiOutlineLogout } from "react-icons/hi";
-import { logout } from '../../services/authApi';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 
 const AdminNavbar = () => {
-  const navigate = useNavigate();
   const { logoutUser } = useAuth();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      // Call logout endpoint (clears cookie)
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    // Clear local storage
+    localStorage.removeItem('user');
+    
+    // Update auth context
     logoutUser();
-    navigate('/');
+    
+    // Redirect to login
+    window.location.href = '/';
   };
 
   return (

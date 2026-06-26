@@ -21,52 +21,36 @@ const Login = () => {
     ? 'https://library-management-j6ec.onrender.com/api'
     : 'http://localhost:3000/api';
 
-  console.log('API_URL:', API_URL);
-  console.log('isProduction:', isProduction);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      console.log('Sending request to:', `${API_URL}/auth/login`);
-      
       const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password
       }, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        withCredentials: true
       });
 
       console.log('Login response:', response.data);
-      console.log('Response headers:', response.headers);
 
       const { user } = response.data;
       
-      if (!user) {
-        throw new Error('No user data in response');
-      }
-      
-      // Save user to localStorage
+      // Save ONLY user to localStorage (no token)
       localStorage.setItem('user', JSON.stringify(user));
-      console.log('User saved to localStorage:', localStorage.getItem('user'));
+      console.log('User saved to localStorage');
       
       // Update auth context
       loginUser(user);
       
       // Navigate
       const redirectUrl = user.role === 'admin' ? '/admin' : '/user';
-      console.log('Redirecting to:', redirectUrl);
-      
       navigate(redirectUrl, { replace: true });
       
     } catch (err) {
       console.error('Login error:', err);
-      console.error('Error response:', err.response);
       setError(err.response?.data?.message || 'Login failed. Please try again.');
       setLoading(false);
     }

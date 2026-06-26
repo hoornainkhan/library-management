@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
         console.log('AuthProvider - user loaded');
       } catch (e) {
+        console.log('AuthProvider - error parsing user');
         setUser(null);
       }
     }
@@ -28,9 +29,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logoutUser = () => {
+    console.log('logoutUser called');
     setUser(null);
     localStorage.removeItem('user');
-    // Token cookie will be cleared by the backend logout endpoint
+    // Token is in cookie, backend will handle clearing it
   };
 
   const value = {
