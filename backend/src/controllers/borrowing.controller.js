@@ -110,12 +110,31 @@ const returnBook = async (req, res) => {
 const getUserBorrowings = async (req, res) => {
   try {
     const userId = req.userId;
+    const now = new Date();
+    
     const borrowings = await Borrowing.find({ userId })
       .populate('bookId', 'title author coverImage')
       .sort({ borrowDate: -1 });
 
-    const activeBorrowings = borrowings.filter(b => b.status === 'borrowed');
-    const history = borrowings.filter(b => b.status !== 'borrowed');
+    // Calculate fines for active borrowings that are overdue
+    const processedBorrowings = borrowings.map(borrowing => {
+      let fine = borrowing.fine || 0;
+      
+      if (borrowing.status === 'borrowed' && borrowing.dueDate < now) {
+        const daysOverdue = Math.ceil(
+          (now - borrowing.dueDate) / (1000 * 60 * 60 * 24)
+        );
+        fine = daysOverdue * 5;
+      }
+      
+      return {
+        ...borrowing.toObject(),
+        fine: fine
+      };
+    });
+
+    const activeBorrowings = processedBorrowings.filter(b => b.status === 'borrowed');
+    const history = processedBorrowings.filter(b => b.status !== 'borrowed');
 
     res.json({
       active: activeBorrowings,
@@ -145,22 +164,36 @@ const getActiveBorrowings = async (req, res) => {
 const getOverdueBooks = async (req, res) => {
   try {
     const now = new Date();
+    
+    // Get overdue books from BOTH scenarios:
+    // 1. Status is 'borrowed' AND dueDate is past
+    // 2. Status is 'overdue' (already marked as overdue)
     const overdue = await Borrowing.find({
-      status: 'borrowed',
-      dueDate: { $lt: now }
+      $or: [
+        { status: 'overdue' },
+        { 
+          status: 'borrowed',
+          dueDate: { $lt: now }
+        }
+      ]
     })
-      .populate('bookId', 'title author')
+      .populate('bookId', 'title author coverImage')
       .populate('userId', 'username email')
       .sort({ dueDate: 1 });
 
     const overdueWithFine = overdue.map(borrowing => {
+      // Calculate days overdue
       const daysOverdue = Math.ceil(
         (now - borrowing.dueDate) / (1000 * 60 * 60 * 24)
       );
+      
+      // Use existing fine if present, otherwise calculate
+      const fine = borrowing.fine || (daysOverdue > 0 ? daysOverdue * 5 : 0);
+      
       return {
         ...borrowing.toObject(),
-        daysOverdue,
-        fine: daysOverdue * 5
+        daysOverdue: daysOverdue > 0 ? daysOverdue : 0,
+        fine: fine
       };
     });
 
@@ -173,15 +206,94 @@ const getOverdueBooks = async (req, res) => {
 
 const getAllBorrowings = async (req, res) => {
   try {
+    const now = new Date();
+    
     const borrowings = await Borrowing.find({})
       .populate('bookId', 'title author')
       .populate('userId', 'username email')
       .sort({ borrowDate: -1 });
 
-    res.json(borrowings);
+    // Calculate fine for any overdue borrowings
+    const borrowingsWithFine = borrowings.map(borrowing => {
+      let fine = borrowing.fine || 0;
+      
+      // If status is 'borrowed' and overdue, calculate fine
+      if (borrowing.status === 'borrowed' && borrowing.dueDate < now) {
+        const daysOverdue = Math.ceil(
+          (now - borrowing.dueDate) / (1000 * 60 * 60 * 24)
+        );
+        fine = daysOverdue * 5;
+      }
+      
+      return {
+        ...borrowing.toObject(),
+        fine: fine
+      };
+    });
+
+    res.json(borrowingsWithFine);
   } catch (error) {
     console.error('Get all borrowings error:', error);
     res.status(500).json({ message: 'Error fetching borrowings' });
+  }
+};
+
+const getDashboardStats = async (req, res) => {
+  try {
+    const now = new Date();
+    
+    // Total books
+    const totalBooks = await Book.countDocuments();
+    
+    // Total users
+    const totalUsers = await User.countDocuments({ role: 'user' });
+    
+    // Active borrowings
+    const activeBorrowings = await Borrowing.find({ status: 'borrowed' })
+      .populate('bookId', 'title')
+      .populate('userId', 'username')
+      .sort({ dueDate: 1 });
+    
+    // Overdue books (both status: 'overdue' and borrowed with past due date)
+    const overdueBooks = await Borrowing.find({
+      $or: [
+        { status: 'overdue' },
+        { 
+          status: 'borrowed',
+          dueDate: { $lt: now }
+        }
+      ]
+    })
+      .populate('bookId', 'title')
+      .populate('userId', 'username');
+    
+    // Calculate total fine
+    const allBorrowings = await Borrowing.find({});
+    let totalFine = 0;
+    
+    allBorrowings.forEach(borrowing => {
+      let fine = borrowing.fine || 0;
+      if (borrowing.status === 'borrowed' && borrowing.dueDate < now) {
+        const daysOverdue = Math.ceil(
+          (now - borrowing.dueDate) / (1000 * 60 * 60 * 24)
+        );
+        fine = daysOverdue * 5;
+      }
+      totalFine += fine;
+    });
+
+    res.json({
+      totalBooks,
+      totalUsers,
+      activeBorrowings: activeBorrowings.length,
+      overdueBooks: overdueBooks.length,
+      totalFine,
+      activeList: activeBorrowings,
+      overdueList: overdueBooks
+    });
+  } catch (error) {
+    console.error('Get dashboard stats error:', error);
+    res.status(500).json({ message: 'Error fetching dashboard stats' });
   }
 };
 
@@ -191,5 +303,6 @@ module.exports = {
   getUserBorrowings,
   getActiveBorrowings,
   getOverdueBooks,
-  getAllBorrowings
+  getAllBorrowings,
+  getDashboardStats
 };

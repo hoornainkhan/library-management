@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+body {
+  background-color: #E5E5F7;
+  background-image:
+    radial-gradient(circle farthest-side at 0% 50%, #E5E5F7 23.5%, transparent 0),
+    radial-gradient(circle farthest-side at 0% 50%, #F3E4C9 24%, transparent 0),
+    linear-gradient(#E5E5F7 14%, transparent 0, transparent 85%, #E5E5F7 0),
+    linear-gradient(150deg, #E5E5F7 24%, #F3E4C9 0 26%, transparent 0 74%, #F3E4C9 0 76%, #E5E5F7 0),
+    linear-gradient(30deg, #E5E5F7 24%, #F3E4C9 0 26%, transparent 0 74%, #F3E4C9 0 76%, #E5E5F7 0),
+    linear-gradient(90deg, #F3E4C9 1.6%, #E5E5F7 0 98.4%, #F3E4C9 0);
+  background-position: 16px 23px, 14px 23px, 0 0, 0 0, 0 0, 0 0;
+  background-size: 30px 45px;
+  color: #0A2947;
+}

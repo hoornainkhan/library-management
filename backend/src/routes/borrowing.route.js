@@ -6,7 +6,8 @@ const {
   getUserBorrowings,
   getActiveBorrowings,
   getOverdueBooks,
-  getAllBorrowings
+  getAllBorrowings,
+  getDashboardStats
 } = require('../controllers/borrowing.controller');
 const { authenticate, isAdmin } = require('../middleware/auth.middleware');
 
@@ -16,5 +17,6 @@ router.get('/my-borrowings', authenticate, getUserBorrowings);
 router.get('/active', authenticate, isAdmin, getActiveBorrowings);
 router.get('/overdue', authenticate, isAdmin, getOverdueBooks);
 router.get('/all', authenticate, isAdmin, getAllBorrowings);
+router.get('/stats', authenticate, isAdmin, getDashboardStats);
 
 module.exports = router;
