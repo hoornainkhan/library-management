@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-// Hardcode the Render URL (temporary fix)
-const API_URL = 'https://library-management-j6ec.onrender.com/api';
+// Check if we're in production or development
+const isProduction = window.location.hostname !== 'localhost';
+const API_URL = isProduction 
+  ? 'https://library-management-j6ec.onrender.com/api'
+  : 'http://localhost:3000/api';
 
 const api = axios.create({
   baseURL: API_URL,

@@ -18,6 +18,12 @@ const Register = () => {
   
   const { loginUser } = useAuth();
 
+  // Check if we're in production or development
+  const isProduction = window.location.hostname !== 'localhost';
+  const API_URL = isProduction 
+    ? 'https://library-management-j6ec.onrender.com/api'
+    : 'http://localhost:3000/api';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -35,7 +41,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
+      const response = await axios.post(`${API_URL}/auth/register`, {
         username,
         email,
         password,
