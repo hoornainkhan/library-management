@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -16,9 +16,9 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
+  const navigate = useNavigate();
   const { loginUser } = useAuth();
 
-  // Check if we're in production or development
   const isProduction = window.location.hostname !== 'localhost';
   const API_URL = isProduction 
     ? 'https://library-management-j6ec.onrender.com/api'
@@ -55,7 +55,7 @@ const Register = () => {
       localStorage.setItem('user', JSON.stringify(user));
       loginUser(user);
       
-      window.location.href = '/user';
+      navigate('/user', { replace: true });
       
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');

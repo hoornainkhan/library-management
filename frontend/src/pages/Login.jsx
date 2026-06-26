@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -13,9 +13,9 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
+  const navigate = useNavigate();
   const { loginUser } = useAuth();
 
-  // Check if we're in production or development
   const isProduction = window.location.hostname !== 'localhost';
   const API_URL = isProduction 
     ? 'https://library-management-j6ec.onrender.com/api'
@@ -38,13 +38,17 @@ const Login = () => {
 
       const { user } = response.data;
       
+      // Save user to localStorage
       localStorage.setItem('user', JSON.stringify(user));
+      
+      // Update auth context
       loginUser(user);
       
+      // Use navigate instead of window.location.href
       const redirectUrl = user.role === 'admin' ? '/admin' : '/user';
       console.log('Redirecting to:', redirectUrl);
       
-      window.location.href = redirectUrl;
+      navigate(redirectUrl, { replace: true });
       
     } catch (err) {
       console.error('Login error:', err);
