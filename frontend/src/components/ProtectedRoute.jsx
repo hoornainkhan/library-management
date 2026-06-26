@@ -2,27 +2,28 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  // Check if user is logged in by checking localStorage for user data
   const userStr = localStorage.getItem('user');
+  const token = localStorage.getItem('token');
   
   console.log('ProtectedRoute - userStr:', userStr);
+  console.log('ProtectedRoute - token:', token);
   
-  // If no user data, redirect to login
   if (!userStr) {
-    console.log('No user data, redirecting to login');
+    console.log('No user found, redirecting to login');
     return <Navigate to="/" replace />;
   }
 
   try {
     const user = JSON.parse(userStr);
-    console.log('ProtectedRoute - user:', user);
+    console.log('ProtectedRoute - parsed user:', user);
     
     if (requiredRole && user.role !== requiredRole) {
-      console.log('Wrong role, redirecting');
-      return <Navigate to={user.role === 'admin' ? '/admin' : '/user'} replace />;
+      console.log(`Wrong role. Required: ${requiredRole}, Got: ${user.role}`);
+      return <Navigate to="/" replace />;
     }
   } catch (e) {
-    console.log('Error parsing user, redirecting to login');
+    console.log('Error parsing user:', e);
+    localStorage.removeItem('user');
     return <Navigate to="/" replace />;
   }
 
