@@ -15,30 +15,33 @@ const Login = () => {
   
   const { loginUser } = useAuth();
 
+  // CONDITIONAL URL - works locally and on Vercel
+  const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  const API_URL = isProduction 
+    ? 'https://library-management-j6ec.onrender.com/api' 
+    : 'http://localhost:3000/api';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password
       }, {
-        withCredentials: true  // This sends/receives cookies
+        withCredentials: true
       });
 
       console.log('Login response:', response.data);
 
       const { user } = response.data;
       
-      // Save ONLY user data to localStorage (not token)
       localStorage.setItem('user', JSON.stringify(user));
       
-      // Update auth context
       loginUser(user);
       
-      // Redirect
       const redirectUrl = user.role === 'admin' ? '/admin' : '/user';
       console.log('Redirecting to:', redirectUrl);
       

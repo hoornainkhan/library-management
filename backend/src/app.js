@@ -6,10 +6,18 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
+// CONDITIONAL CORS - works locally and on Vercel
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://library-management-pink-six.vercel.app'
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',  //  frontend
+  origin: allowedOrigins,
   credentials: true
 }));
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan('dev'));

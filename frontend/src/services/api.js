@@ -1,14 +1,18 @@
 import axios from 'axios';
 
+// CONDITIONAL URL - works locally and on Vercel
+const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+const API_URL = isProduction 
+  ? 'https://library-management-j6ec.onrender.com/api' 
+  : 'http://localhost:3000/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,  // This sends cookies automatically
+  withCredentials: true,
 });
-
-// No need to add Authorization header - cookies handle authentication
 
 // Handle 401 responses
 api.interceptors.response.use(
