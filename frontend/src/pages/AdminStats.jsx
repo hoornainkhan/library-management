@@ -24,19 +24,19 @@ const AdminStats = () => {
         
         // Get active borrowings
         const active = await getActiveBorrowings();
-        console.log('Active borrowings:', active);
+        // console.log('Active borrowings:', active);
         
         // Get overdue books
         const overdue = await getOverdueBooks();
-        console.log('Overdue from API:', overdue);
+        // console.log('Overdue from API:', overdue);
         
         // Get ALL borrowings for fine calculation
         const allBorrowings = await getAllBorrowings();
-        console.log('All borrowings:', allBorrowings);
+        // console.log('All borrowings:', allBorrowings);
         
         // Calculate total fine from ALL borrowings
         const totalFine = allBorrowings.reduce((sum, b) => sum + (b.fine || 0), 0);
-        console.log('Total fine:', totalFine);
+        // console.log('Total fine:', totalFine);
         
         // Calculate unique users
         const uniqueUsers = new Set();

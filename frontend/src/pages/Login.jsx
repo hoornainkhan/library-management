@@ -34,7 +34,7 @@ const Login = () => {
         withCredentials: true
       });
 
-      console.log('Login response:', response.data);
+    //   console.log('Login response:', response.data);
 
       const { user } = response.data;
       
@@ -43,7 +43,7 @@ const Login = () => {
       loginUser(user);
       
       const redirectUrl = user.role === 'admin' ? '/admin' : '/user';
-      console.log('Redirecting to:', redirectUrl);
+    //   console.log('Redirecting to:', redirectUrl);
       
       window.location.href = redirectUrl;
       

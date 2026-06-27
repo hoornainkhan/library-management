@@ -18,8 +18,8 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log("401 FROM:", error.config?.url);
-    console.log(error.response?.data);
+    // console.log("401 FROM:", error.config?.url);
+    // console.log(error.response?.data);
 
     return Promise.reject(error);
   }

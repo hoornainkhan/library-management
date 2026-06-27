@@ -8,12 +8,12 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    console.log('AuthProvider - storedUser:', storedUser);
+    // console.log('AuthProvider - storedUser:', storedUser);
     
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
-        console.log('AuthProvider - user loaded');
+        // console.log('AuthProvider - user loaded');
       } catch (e) {
         setUser(null);
       }
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginUser = (userData) => {
-    console.log('loginUser called with:', userData);
+    // console.log('loginUser called with:', userData);
     setUser(userData);
     // User is already saved to localStorage in Login page
   };
